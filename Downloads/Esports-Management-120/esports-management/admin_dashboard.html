@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Esports Management</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/admin_dashboard.css">
+</head>
+<body>
+    <div class="dashboard-loader">
+        <div class="loader-content">
+            <div class="loader-logo">
+                <i class="fas fa-gamepad"></i>
+            </div>
+            <div class="loader-text">Loading Dashboard</div>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <div class="header-top">
+                <div class="logo-container">
+                    <i class="fas fa-gamepad logo-icon"></i>
+                    <h1>Esportify</h1>
+                </div>
+                <div class="user-actions">
+                    <div class="user-info">
+                        <i class="fas fa-user-circle"></i>
+                        <span>admin@example.com</span>
+                    </div>
+                    <button class="mode-toggle" id="mode-toggle">
+                        <i class="fas fa-sun"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="header-welcome">
+                <h2>Welcome to your Admin Command Center</h2>
+                <p>Manage your esports platform, track statistics, and monitor upcoming events</p>
+            </div>
+        </div>
+
+        <div class="content-wrapper">
+            <div class="nav-column">
+                <div class="admin-profile">
+                    <div class="profile-picture">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <div class="profile-info">
+                        <h3>Admin Portal</h3>
+                        <p>ID: 123</p>
+                    </div>
+                </div>
+
+                <a href="admin/manage_users.html" class="nav-card fade-in">
+                    <div class="card-icon"><i class="fas fa-users"></i></div>
+                    <div class="card-content">
+                        <h3>Manage Users</h3>
+                        <p>Add, edit, delete users</p>
+                    </div>
+                </a>
+                
+                <a href="admin/manage_teams.html" class="nav-card fade-in">
+                    <div class="card-icon"><i class="fas fa-shield-alt"></i></div>
+                    <div class="card-content">
+                        <h3>Manage Teams</h3>
+                        <p>Create, edit, remove teams</p>
+                    </div>
+                </a>
+                
+                <a href="admin/manage_matches.html" class="nav-card fade-in">
+                    <div class="card-icon"><i class="fas fa-gamepad"></i></div>
+                    <div class="card-content">
+                        <h3>Manage Matches</h3>
+                        <p>Schedule, update, delete matches</p>
+                    </div>
+                </a>
+                
+                <a href="admin/leaderboard.html" class="nav-card fade-in">
+                    <div class="card-icon"><i class="fas fa-trophy"></i></div>
+                    <div class="card-content">
+                        <h3>Leaderboard</h3>
+                        <p>View top players and rankings</p>
+                    </div>
+                </a>
+                
+                <a href="logout.html" class="nav-card logout-card fade-in">
+                    <div class="card-icon"><i class="fas fa-power-off"></i></div>
+                    <div class="card-content">
+                        <h3>Logout</h3>
+                        <p>End admin session</p>
+                    </div>
+                </a>
+            </div>
+
+            <div class="dashboard-column">
+                <!-- DSA Player/Team Search Widget - Compact Top Version -->
+                <div class="widget search-widget-compact fade-in">
+                    <div class="search-container-compact">
+                        <div class="search-input-group-compact">
+                            <input type="text" id="dsaSearchInput" placeholder="Search players or teams..." class="search-input-compact">
+                            <button id="dsaSearchBtn" class="search-btn-compact">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                        <div id="searchResults" class="search-results-compact">
+                            <div class="search-placeholder-compact">
+                                <i class="fas fa-info-circle"></i>
+                                <p>Enter a name to search for players and teams</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="widget stats-widget fade-in">
+                    <h2><i class="fas fa-chart-line"></i> Platform Overview</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-users"></i></div>
+                            <div class="stat-info">
+                                <h4>Users</h4>
+                                <p class="counter">120</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-shield-alt"></i></div>
+                            <div class="stat-info">
+                                <h4>Teams</h4>
+                                <p class="counter">35</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-gamepad"></i></div>
+                            <div class="stat-info">
+                                <h4>Matches</h4>
+                                <p class="counter">78</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-trophy"></i></div>
+                            <div class="stat-info">
+                                <h4>Tournaments</h4>
+                                <p class="counter">5</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="widgets-row">
+                    <div class="widget upcoming-matches fade-in">
+                        <h2><i class="fas fa-calendar-alt"></i> Upcoming Matches</h2>
+                        <div class="match-list">
+                            <div class="match-item">
+                                <div class="match-teams">
+                                    <span class="team team1">Team Alpha</span>
+                                    <span class="vs">VS</span>
+                                    <span class="team team2">Team Omega</span>
+                                </div>
+                                <div class="match-date">
+                                    <i class="far fa-clock"></i>
+                                    Oct 10, 18:00
+                                </div>
+                            </div>
+                            <div class="match-item">
+                                <div class="match-teams">
+                                    <span class="team team1">Team Phoenix</span>
+                                    <span class="vs">VS</span>
+                                    <span class="team team2">Team Hydra</span>
+                                </div>
+                                <div class="match-date">
+                                    <i class="far fa-clock"></i>
+                                    Oct 12, 20:30
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="widget top-teams fade-in">
+                        <h2><i class="fas fa-medal"></i> Top Teams</h2>
+                        <div class="teams-list">
+                            <div class="team-item">
+                                <div class="rank">#1</div>
+                                <div class="team-name">Team Alpha</div>
+                                <div class="team-record">
+                                    <span class="wins">10W</span>
+                                    <span class="separator">-</span>
+                                    <span class="losses">2L</span>
+                                </div>
+                            </div>
+                            <div class="team-item">
+                                <div class="rank">#2</div>
+                                <div class="team-name">Team Omega</div>
+                                <div class="team-record">
+                                    <span class="wins">9W</span>
+                                    <span class="separator">-</span>
+                                    <span class="losses">3L</span>
+                                </div>
+                            </div>
+                            <div class="team-item">
+                                <div class="rank">#3</div>
+                                <div class="team-name">Team Phoenix</div>
+                                <div class="team-record">
+                                    <span class="wins">8W</span>
+                                    <span class="separator">-</span>
+                                    <span class="losses">4L</span>
+                                </div>
+                            </div>
+                            <div class="team-item">
+                                <div class="rank">#4</div>
+                                <div class="team-name">Team Hydra</div>
+                                <div class="team-record">
+                                    <span class="wins">7W</span>
+                                    <span class="separator">-</span>
+                                    <span class="losses">5L</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-footer">
+            <p>&copy; 2025 Esports Arena Management System</p>
+        </div>
+    </div>
+
+    <script src="js/admin_dashboard.js"></script>
+    
+    <!-- DSA Search Functionality -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('dsaSearchInput');
+            const searchBtn = document.getElementById('dsaSearchBtn');
+            const searchResults = document.getElementById('searchResults');
+            
+            // Search function using Trie DSA
+            async function performSearch(query) {
+                if (!query.trim()) {
+                    showPlaceholder();
+                    return;
+                }
+                
+                try {
+                    showLoading();
+                    const response = await fetch(`/api/search/${encodeURIComponent(query)}`);
+                    const data = await response.json();
+                    
+                    if (data.matches && data.matches.length > 0) {
+                        displayResults(data.matches, query);
+                    } else {
+                        showNoResults(query);
+                    }
+                } catch (error) {
+                    console.error('Search error:', error);
+                    showError('Search failed. Please try again.');
+                }
+            }
+            
+            // Display search results
+            function displayResults(matches, query) {
+                searchResults.innerHTML = `
+                    <div class="search-header-compact">
+                        <h4><i class="fas fa-users"></i> Found ${matches.length} result(s) for "${query}"</h4>
+                    </div>
+                    <div class="results-list-compact">
+                        ${matches.map(match => `
+                            <div class="result-item-compact">
+                                <div class="result-avatar-compact">
+                                    <i class="fas fa-user-circle"></i>
+                                </div>
+                                <div class="result-info-compact">
+                                    <div class="result-name-compact">${match.fullName || match.username}</div>
+                                    <div class="result-details-compact">
+                                        <span class="result-email-compact">${match.email}</span>
+                                        <span class="result-role-compact ${match.role}">${match.role}</span>
+                                    </div>
+                                </div>
+                                <div class="result-actions-compact">
+                                    <button class="action-btn-compact view-btn-compact" onclick="viewUser('${match.uid}')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="action-btn-compact edit-btn-compact" onclick="editUser('${match.uid}')">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+            
+            // Show placeholder
+            function showPlaceholder() {
+                searchResults.innerHTML = `
+                    <div class="search-placeholder-compact">
+                        <i class="fas fa-info-circle"></i>
+                        <p>Enter a name to search for players and teams</p>
+                    </div>
+                `;
+            }
+            
+            // Show loading state
+            function showLoading() {
+                searchResults.innerHTML = `
+                    <div class="search-loading-compact">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Searching...</p>
+                    </div>
+                `;
+            }
+            
+            // Show no results
+            function showNoResults(query) {
+                searchResults.innerHTML = `
+                    <div class="search-no-results-compact">
+                        <i class="fas fa-search"></i>
+                        <p>No results found for "${query}"</p>
+                        <small>Try a different search term</small>
+                    </div>
+                `;
+            }
+            
+            // Show error
+            function showError(message) {
+                searchResults.innerHTML = `
+                    <div class="search-error-compact">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>${message}</p>
+                    </div>
+                `;
+            }
+            
+            // Event listeners
+            searchBtn.addEventListener('click', () => {
+                performSearch(searchInput.value);
+            });
+            
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    performSearch(searchInput.value);
+                }
+            });
+            
+            // Real-time search as user types (with debounce)
+            let searchTimeout;
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    performSearch(e.target.value);
+                }, 300);
+            });
+            
+            // Action functions
+            window.viewUser = function(uid) {
+                alert(`View user: ${uid}`);
+                // You can implement user viewing functionality here
+            };
+            
+            window.editUser = function(uid) {
+                alert(`Edit user: ${uid}`);
+                // You can implement user editing functionality here
+            };
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Team</title>
+    <link rel="stylesheet" href="../css/add_team.css">
+</head>
+<body>
+    <div class="add-team-container">
+        <h2>Add New Team</h2>
+        <form id="addTeamForm">
+            <label>Team Name:</label>
+            <input type="text" name="name" id="teamName" required>
+
+            <label>Logo (filename):</label>
+            <input type="text" name="logo" id="teamLogo" placeholder="e.g. team1.png">
+
+            <label>Manager ID:</label>
+            <input type="number" name="manager_id" id="managerId" required>
+
+            <label>Creation Date:</label>
+            <input type="date" name="creation_date" id="creationDate" required>
+
+            <button type="submit">Add Team</button>
+            <!-- Fixed back button: points to the correct dashboard folder -->
+            <a href="../admin_dashboard.html" class="back-btn">← Back to Dashboard</a>
+        </form>
+</div>
+
+        <!-- Firebase (client) SDKs -->
+        <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+
+        <script>
+            // Use the same firebaseConfig used elsewhere in the repo
+            const firebaseConfig = {
+                apiKey: "AIzaSyDUFqfDlyZF_aA18Dc7ytirEja6E2rFCgQ",
+                authDomain: "esports-62899.firebaseapp.com",
+                databaseURL: "https://esports-62899-default-rtdb.firebaseio.com",
+                projectId: "esports-62899",
+                storageBucket: "esports-62899.appspot.com",
+                messagingSenderId: "561025327999",
+                appId: "1:561025327999:web:76a25a1f580903263ff04a",
+                measurementId: "G-ZRLL1WY4D7"
+            };
+
+                        // Initialize Firebase (if not already initialized)
+                        if (!window.firebase || !firebase.apps || firebase.apps.length === 0) {
+                                firebase.initializeApp(firebaseConfig);
+                        }
+                        const rtdb = firebase.database();
+
+                        // If the page is opened via file:// the origin is 'null' and Firebase auth often fails.
+                        if (window.location.protocol === 'file:') {
+                            console.warn('Page served via file:// — this can break Firebase client auth. Serve the site over http://localhost using a simple static server.');
+                        }
+
+                        // Try signing in anonymously so client writes are authenticated (helps when RTDB rules require auth)
+                        // We'll wait for auth to complete before enabling the form submit to avoid permission errors.
+                        let authReady = false;
+                        const submitBtn = document.querySelector('#addTeamForm button[type="submit"]');
+                        if (submitBtn) submitBtn.disabled = true;
+
+                        // Add a small debug panel (visible on the page) to run a test write and show status.
+                        const debugPanel = document.createElement('div');
+                        debugPanel.style.cssText = 'position:fixed;right:10px;bottom:10px;padding:10px;background:#fff;border:1px solid #ccc;z-index:9999;font-size:12px;';
+                        debugPanel.innerHTML = '<strong>RTDB Debug</strong><div id="dbg-status">Initializing...</div><button id="dbg-test">Test write</button>';
+                        document.body.appendChild(debugPanel);
+                        const dbgStatus = document.getElementById('dbg-status');
+                        const dbgTestBtn = document.getElementById('dbg-test');
+                        dbgTestBtn.addEventListener('click', async () => {
+                            dbgStatus.textContent = 'Attempting test write...';
+                            try {
+                                const tmpRef = rtdb.ref('__client_test').push();
+                                await tmpRef.set({ts: Date.now()});
+                                dbgStatus.textContent = 'Test write succeeded: ' + tmpRef.key + ' (removing)...';
+                                await tmpRef.remove();
+                                dbgStatus.textContent = 'Test write succeeded and removed.';
+                                console.log('Client test write succeeded');
+                            } catch (err) {
+                                dbgStatus.textContent = 'Test write failed: ' + (err && err.code ? err.code : err.message || err);
+                                console.error('Client test write error:', err);
+                                alert('Test write failed - check console for details.');
+                            }
+                        });
+
+                        if (firebase && firebase.auth) {
+                            firebase.auth().onAuthStateChanged(user => {
+                                if (user) {
+                                    console.log('Signed in as', user.uid);
+                                    authReady = true;
+                                    if (submitBtn) submitBtn.disabled = false;
+                                } else {
+                                    // attempt anonymous sign-in
+                                    firebase.auth().signInAnonymously()
+                                                    .then(cred => {
+                                                        console.log('Anonymous sign-in successful:', cred.user.uid);
+                                                        authReady = true;
+                                                        if (submitBtn) submitBtn.disabled = false;
+                                                        if (dbgStatus) dbgStatus.textContent = 'Signed in as ' + cred.user.uid;
+                                                    })
+                                        .catch(err => {
+                                            console.warn('Anonymous sign-in failed', err);
+                                            // allow manual attempts but keep button enabled so user sees errors when submitting
+                                            if (submitBtn) submitBtn.disabled = false;
+                                        });
+                                }
+                            });
+                        } else {
+                            console.warn('Firebase auth not available');
+                            if (submitBtn) submitBtn.disabled = false;
+                            if (dbgStatus) dbgStatus.textContent = 'Firebase auth not available';
+                        }
+
+            document.getElementById('addTeamForm').addEventListener('submit', async function(e) {
+                e.preventDefault(); // prevent page reload
+
+                const newTeam = {
+                    name: document.getElementById('teamName').value,
+                    logo: document.getElementById('teamLogo').value,
+                    manager_id: Number(document.getElementById('managerId').value),
+                    creation_date: document.getElementById('creationDate').value
+                };
+
+                // Update debug panel status
+                if (dbgStatus) dbgStatus.textContent = 'Submitting team...';
+
+                // Primary: POST to backend which uses Admin SDK (guaranteed to work if server running)
+                try {
+                    console.log('Submitting team to backend as primary:', newTeam);
+                    const resp = await fetch('http://localhost:3000/api/team', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(newTeam)
+                    });
+                    const text = await resp.text();
+                    let data;
+                    try { data = JSON.parse(text); } catch(e) { data = { raw: text }; }
+                    console.log('Backend response', resp.status, data);
+                    if (resp.ok) {
+                        if (dbgStatus) dbgStatus.textContent = 'Submitted — server key: ' + (data.key || '') ;
+                        // Redirect to Manage Teams page
+                        window.location.href = "manage_teams.html";
+                        return;
+                    }
+                    // If backend returned non-ok, fall through to try client write
+                    console.warn('Backend POST returned non-OK, attempting client RTDB write as fallback');
+                } catch (err) {
+                    console.warn('Backend POST failed, will attempt client RTDB write:', err);
+                }
+
+                // Secondary: try client RTDB write (non-blocking)
+                (async () => {
+                    try {
+                        console.log('Attempting client RTDB push (secondary) authReady=', authReady);
+                        const newRef = rtdb.ref('Team').push();
+                        await newRef.set(newTeam);
+                        console.log('Client RTDB write succeeded key=', newRef.key);
+                    } catch (err) {
+                        console.error('Client RTDB push failed (secondary):', err);
+                        if (dbgStatus) dbgStatus.textContent = 'Client RTDB push failed.';
+                    }
+                })();
+
+            });
+        </script>
+</body>
+</html>

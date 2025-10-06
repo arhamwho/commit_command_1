@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Delete User</title>
+  <link rel="stylesheet" href="../css/edit_match.css">
+</head>
+<body>
+  <div class="delete-user-container">
+    <h2>Delete User</h2>
+    
+    <label for="userId">Enter User ID to delete:</label><br>
+    <input type="number" id="userId" placeholder="User ID"><br><br>
+
+    <button onclick="deleteUser()">Delete</button>
+    <a href="manage_users.html">← Back to Users</a>
+
+    <div id="message"></div>
+  </div>
+
+  <script>
+    // Fake Users dataset in localStorage (simulate DB)
+    if (!localStorage.getItem("users")) {
+      const sampleUsers = [
+        {id: 1, name: "Alice"},
+        {id: 2, name: "Bob"},
+        {id: 3, name: "Charlie"}
+      ];
+      localStorage.setItem("users", JSON.stringify(sampleUsers));
+    }
+
+    function deleteUser() {
+      const userId = parseInt(document.getElementById("userId").value);
+      let users = JSON.parse(localStorage.getItem("users")) || [];
+
+      const index = users.findIndex(u => u.id === userId);
+      if (index !== -1) {
+        users.splice(index, 1);
+        localStorage.setItem("users", JSON.stringify(users));
+        document.getElementById("message").innerText =
+          `✅ User with ID ${userId} deleted successfully!`;
+        // Simulate redirect like PHP
+        setTimeout(() => {
+          window.location.href = "manage_users.html";
+        }, 1500);
+      } else {
+        document.getElementById("message").innerText =
+          `❌ User ID ${userId} not found.`;
+      }
+    }
+  </script>
+</body>
+</html>

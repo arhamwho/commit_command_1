@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Delete Match</title>
+  <link rel="stylesheet" href="../css/edit_match.css">
+</head>
+<body>
+  <div class="delete-match-container">
+    <h2>Delete Match</h2>
+    
+    <label for="matchId">Enter Match ID to delete:</label><br>
+    <input type="number" id="matchId" placeholder="Match ID"><br><br>
+
+    <button onclick="deleteMatch()">Delete</button>
+    <a href="manage_matches.html">← Back to Matches</a>
+
+    <div id="message"></div>
+  </div>
+
+  <script>
+    // Fake matches dataset in localStorage
+    if (!localStorage.getItem("matches")) {
+      const sampleMatches = [
+        {id: 1, teams: "Team A vs Team B"},
+        {id: 2, teams: "Team C vs Team D"},
+        {id: 3, teams: "Team E vs Team F"}
+      ];
+      localStorage.setItem("matches", JSON.stringify(sampleMatches));
+    }
+
+    function deleteMatch() {
+      const matchId = parseInt(document.getElementById("matchId").value);
+      let matches = JSON.parse(localStorage.getItem("matches")) || [];
+
+      const index = matches.findIndex(m => m.id === matchId);
+      if (index !== -1) {
+        matches.splice(index, 1);
+        localStorage.setItem("matches", JSON.stringify(matches));
+        document.getElementById("message").innerText =
+          `✅ Match with ID ${matchId} deleted successfully!`;
+      } else {
+        document.getElementById("message").innerText =
+          `❌ Match ID ${matchId} not found.`;
+      }
+    }
+  </script>
+</body>
+</html>

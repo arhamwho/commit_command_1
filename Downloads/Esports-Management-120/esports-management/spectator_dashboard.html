@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Esportify | Spectator Hub</title>
+    <link rel="stylesheet" href="css/spectator_dashboard.css">
+    <link rel="stylesheet" href="css/dashboard-loading.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Loading Screen - Exact Admin Dashboard Style -->
+    <div class="dashboard-loader" id="dashboardLoader">
+        <div class="loader-content">
+            <div class="loader-logo">
+                <i class="fas fa-gamepad"></i>
+            </div>
+            <div class="loader-text">Loading Spectator Hub</div>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        <div class="dashboard-sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-gamepad"></i>
+                    <span>ESPORTIFY</span>
+                </div>
+            </div>
+            
+            <div class="user-profile">
+                <div class="avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="user-info">
+                    <p class="username">[User Email]</p>
+                    <p class="user-role">ID [User ID]</p>
+                    <span class="user-role">Spectator</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="active">
+                        <a href="#"><i class="fas fa-home"></i> Dashboard</a>
+                    </li>
+                    <li>
+                        <a href="spectator/view_matches.html"><i class="fas fa-trophy"></i> Matches</a>
+                    </li>
+                    <li>
+                        <a href="spectator/view_teams.html"><i class="fas fa-users"></i> Teams</a>
+                    </li>
+                    <li>
+                        <a href="spectator/view_players.html"><i class="fas fa-user-astronaut"></i> Players</a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <a href="logout.html" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+                <button id="themeToggle" class="theme-toggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="header">
+                <h1>Welcome to Esportify</h1>
+                <p>Your hub for esports tournaments, teams, and players</p>
+            </div>
+            
+            <div class="stats-container">
+                <div class="stat-card fade-in">
+                    <div class="stat-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Active Tournaments</h3>
+                        <p class="stat-value">[Tournament Count]</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card fade-in">
+                    <div class="stat-icon">
+                        <i class="fas fa-gamepad"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Ongoing Matches</h3>
+                        <p class="stat-value">[Match Count]</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card fade-in">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Active Teams</h3>
+                        <p class="stat-value">[Team Count]</p>
+                    </div>
+                </div>
+                
+                <div class="stat-card fade-in">
+                    <div class="stat-icon">
+                        <i class="fas fa-broadcast-tower"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Live Streams</h3>
+                        <p class="stat-value">[Stream Count]</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-grid">
+                <div class="content-card featured-matches fade-in">
+                    <div class="card-header">
+                        <h2><i class="fas fa-gamepad"></i> Featured Matches</h2>
+                        <a href="spectator/view_matches.html" class="view-all">View All</a>
+                    </div>
+                    <div class="card-content">
+                        <div class="match">
+                            <div class="match-status upcoming">[Status]</div>
+                            <div class="match-teams">
+                                <div class="team">
+                                    <span>[Team 1 Name]</span>
+                                </div>
+                                <div class="match-score">
+                                    <span>VS</span>
+                                </div>
+                                <div class="team">
+                                    <span>[Team 2 Name]</span>
+                                </div>
+                            </div>
+                            <div class="match-info">
+                                <span class="tournament-name">[Tournament Name]</span>
+                                <a href="#" class="remind-btn"><i class="far fa-bell"></i> Remind</a>
+                            </div>
+                        </div>
+                        <!-- Repeat match cards as needed -->
+                    </div>
+                </div>
+                
+                <div class="content-card top-teams fade-in">
+                    <div class="card-header">
+                        <h2><i class="fas fa-users"></i> Top Teams</h2>
+                        <a href="spectator/view_teams.html" class="view-all">View All</a>
+                    </div>
+                    <div class="card-content">
+                        <div class="team-ranking">
+                            <div class="rank">1</div>
+                            <div class="team-info">
+                                <span class="team-name">[Team Name]</span>
+                            </div>
+                            <div class="team-record">
+                                <span class="wins">[Wins]</span>
+                                <span class="record-divider">-</span>
+                                <span class="losses">[Losses]</span>
+                            </div>
+                        </div>
+                        <!-- Repeat top team cards as needed -->
+                    </div>
+                </div>
+                
+                <div class="content-card featured-players fade-in">
+                    <div class="card-header">
+                        <h2><i class="fas fa-user-astronaut"></i> Star Players</h2>
+                        <a href="spectator/view_players.html" class="view-all">View All</a>
+                    </div>
+                    <div class="card-content">
+                        <div class="player-card">
+                            <div class="player-info">
+                                <h3 class="player-name">[Player Name]</h3>
+                                <p class="player-team">[Team Name] - [Role]</p>
+                                <div class="player-stats">
+                                    <div class="stat">
+                                        <span class="stat-label">K/D</span>
+                                        <span class="stat-value">[K/D]</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="stat-label">Win Rate</span>
+                                        <span class="stat-value">[Win Rate]%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Repeat player cards as needed -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/spectator_dashboard.js"></script>
+    <script>
+        // Loading Animation Controller - Exact Admin Dashboard Style
+        document.addEventListener('DOMContentLoaded', function() {
+            const dashboardLoader = document.getElementById('dashboardLoader');
+            const fadeElements = document.querySelectorAll('.fade-in');
+            
+            // Show loading screen initially
+            dashboardLoader.style.display = 'flex';
+            
+            // Simulate loading time and then show content
+            setTimeout(() => {
+                // Hide loading screen
+                dashboardLoader.style.opacity = '0';
+                dashboardLoader.style.visibility = 'hidden';
+                
+                // Trigger fade-in animations with staggered delays
+                fadeElements.forEach((element, index) => {
+                    setTimeout(() => {
+                        element.classList.add('visible');
+                    }, index * 150); // 150ms delay between each element
+                });
+            }, 2000); // 2 second loading simulation
+        });
+    </script>
+</body>
+</html>

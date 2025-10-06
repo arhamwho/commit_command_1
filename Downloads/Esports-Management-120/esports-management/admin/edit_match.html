@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Match</title>
+  
+  <link rel="stylesheet" href="../css/edit_match.css">
+  
+</head>
+<body>
+  <div class="edit-match-container">
+    <h2>Edit Match</h2>
+
+    <label for="matchId">Enter Match ID to edit:</label><br>
+    <input type="number" id="matchId" placeholder="Match ID"><br><br>
+    <button onclick="loadMatch()">Load Match</button>
+
+    <form id="editForm" style="display:none;" onsubmit="updateMatch(event)">
+      <label>Tournament ID:</label>
+      <input type="number" id="tournament_id" required><br>
+
+      <label>Team 1 ID:</label>
+      <input type="number" id="team1_id" required><br>
+
+      <label>Team 2 ID:</label>
+      <input type="number" id="team2_id" required><br>
+
+      <label>Match Date:</label>
+      <input type="datetime-local" id="match_date" required><br>
+
+      <label>Result:</label>
+      <input type="text" id="result_text" required><br><br>
+
+      <button type="submit">Update Match</button>
+      <a href="manage_matches.html">← Back</a>
+    </form>
+
+    <div id="message"></div>
+  </div>
+
+  <script>
+    // Initialize sample matches if not present
+    if (!localStorage.getItem("matches")) {
+      const sampleMatches = [
+        {id:1,tournament_id:101,team1_id:1,team2_id:2,match_date:"2025-09-28T14:00", result:"Team 1 won"},
+        {id:2,tournament_id:102,team1_id:3,team2_id:4,match_date:"2025-09-29T16:00", result:"Team 2 won"}
+      ];
+      localStorage.setItem("matches", JSON.stringify(sampleMatches));
+    }
+
+    let currentMatch = null;
+
+    function loadMatch() {
+      const matchId = parseInt(document.getElementById("matchId").value);
+      const matches = JSON.parse(localStorage.getItem("matches"));
+      currentMatch = matches.find(m => m.id === matchId);
+
+      if (currentMatch) {
+        document.getElementById("editForm").style.display = "block";
+        document.getElementById("tournament_id").value = currentMatch.tournament_id;
+        document.getElementById("team1_id").value = currentMatch.team1_id;
+        document.getElementById("team2_id").value = currentMatch.team2_id;
+        document.getElementById("match_date").value = currentMatch.match_date;
+        document.getElementById("result_text").value = currentMatch.result;
+        document.getElementById("message").innerText = "";
+      } else {
+        document.getElementById("message").innerText = "❌ Match not found.";
+        document.getElementById("editForm").style.display = "none";
+      }
+    }
+
+    function updateMatch(e) {
+      e.preventDefault();
+      const matches = JSON.parse(localStorage.getItem("matches"));
+      const index = matches.findIndex(m => m.id === currentMatch.id);
+
+      if (index !== -1) {
+        matches[index] = {
+          id: currentMatch.id,
+          tournament_id: parseInt(document.getElementById("tournament_id").value),
+          team1_id: parseInt(document.getElementById("team1_id").value),
+          team2_id: parseInt(document.getElementById("team2_id").value),
+          match_date: document.getElementById("match_date").value,
+          result: document.getElementById("result_text").value
+        };
+        localStorage.setItem("matches", JSON.stringify(matches));
+        document.getElementById("message").innerText = "✅ Match updated successfully!";
+        setTimeout(()=>{ window.location.href="manage_matches.html"; }, 1500);
+      }
+    }
+  </script>
+</body>
+</html>

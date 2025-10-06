@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Users</title>
+    <link rel="stylesheet" href="../css/manage_users.css">
+</head>
+<body>
+    <div class="container">
+        <h2 class="page-title">Manage Users</h2>
+        <a href="../admin_dashboard.html" class="back-btn">← Back to Dashboard</a>
+        <div style="margin:10px 0;">
+            <span id="authStatus">Checking sign-in status…</span>
+            <a id="loginLink" href="/login.html" style="margin-left:10px;display:none">Sign in</a>
+            <button id="refreshUsersBtn" style="margin-left:10px;display:none">Refresh</button>
+        </div>
+
+
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="usersTableBody"></tbody>
+        </table>
+    </div>
+
+    <script>
+        // Initialize sample users if not present
+        if (!localStorage.getItem("users")) {
+            const sampleUsers = [
+                {user_id:1, email:"admin@example.com", role:"admin"},
+                {user_id:2, email:"manager@example.com", role:"team_manager"},
+                {user_id:3, email:"player@example.com", role:"player"}
+            ];
+            localStorage.setItem("users", JSON.stringify(sampleUsers));
+        }
+
+        function loadUsers() {
+            const users = JSON.parse(localStorage.getItem("users"));
+            const tbody = document.getElementById("usersTableBody");
+            tbody.innerHTML = "";
+
+            if (users.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='3'>No users found.</td></tr>";
+                return;
+            }
+
+            users.forEach(user => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td>${user.email}</td>
+                    <td>${user.role}</td>
+                    <td>
+                        <a href="edit_user.html?id=${user.user_id}" class="edit-btn">Edit</a>
+                        <a href="#" class="delete-btn" onclick="deleteUser(${user.user_id})">Delete</a>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function deleteUser(userId) {
+            if (confirm("Are you sure?")) {
+                let users = JSON.parse(localStorage.getItem("users"));
+                users = users.filter(u => u.user_id !== userId);
+                localStorage.setItem("users", JSON.stringify(users));
+                loadUsers();
+            }
+        }
+
+        // Load users using Firebase client auth token (auto) and render
+        (function() {
+            // Load Firebase client SDKs
+            const s1 = document.createElement('script'); s1.src = 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js'; document.head.appendChild(s1);
+            const s2 = document.createElement('script'); s2.src = 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js'; document.head.appendChild(s2);
+
+            // Wait until SDKs loaded
+            function whenReady(fn) {
+                const check = () => {
+                    if (window.firebase && firebase.auth) return fn();
+                    setTimeout(check, 50);
+                };
+                check();
+            }
+
+            whenReady(() => {
+                const firebaseConfig = {
+                    apiKey: "AIzaSyDUFqfDlyZF_aA18Dc7ytirEja6E2rFCgQ",
+                    authDomain: "esports-62899.firebaseapp.com",
+                    databaseURL: "https://esports-62899-default-rtdb.firebaseio.com",
+                    projectId: "esports-62899",
+                    storageBucket: "esports-62899.appspot.com",
+                    messagingSenderId: "561025327999",
+                    appId: "1:561025327999:web:76a25a1f580903263ff04a",
+                    measurementId: "G-ZRLL1WY4D7"
+                };
+                if (!firebase.apps || firebase.apps.length === 0) firebase.initializeApp(firebaseConfig);
+
+                const authStatusEl = document.getElementById('authStatus');
+                const loginLink = document.getElementById('loginLink');
+                const refreshBtn = document.getElementById('refreshUsersBtn');
+
+                refreshBtn.addEventListener('click', () => { loadUsers(); });
+
+                firebase.auth().onAuthStateChanged(async (user) => {
+                    const tbody = document.getElementById('usersTableBody');
+                    if (!user) {
+                        authStatusEl.textContent = 'Not signed in. Please sign in as admin.';
+                        loginLink.style.display = 'inline';
+                        refreshBtn.style.display = 'none';
+                        tbody.innerHTML = '<tr><td colspan="3">Not signed in. Please sign in.</td></tr>';
+                        return;
+                    }
+                    authStatusEl.textContent = 'Signed in as ' + (user.email || user.uid);
+                    loginLink.style.display = 'none';
+                    refreshBtn.style.display = 'inline';
+                    // obtain ID token and load users
+                    try {
+                        const idToken = await user.getIdToken();
+                        await loadUsersWithToken(idToken);
+                    } catch (err) {
+                        tbody.innerHTML = `<tr><td colspan="3">Failed to get ID token: ${err.message}</td></tr>`;
+                    }
+                });
+            });
+
+            async function loadUsersWithToken(token) {
+                const tbody = document.getElementById('usersTableBody');
+                tbody.innerHTML = '';
+                try {
+                    const resp = await fetch('/api/auth/users', { headers: { Authorization: 'Bearer ' + token } });
+                    if (!resp.ok) {
+                        const t = await resp.text().catch(()=>'');
+                        tbody.innerHTML = `<tr><td colspan="3">Failed to load users: ${resp.status} ${t}</td></tr>`;
+                        return;
+                    }
+                    const data = await resp.json();
+                    const users = data.users || [];
+                    if (users.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="3">No users found.</td></tr>';
+                        return;
+                    }
+                    users.forEach(u => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${u.email || ''}</td>
+                            <td>${u.role || ''}</td>
+                            <td>
+                                <button class="delete-btn" data-uid="${u.uid}">Delete</button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                    // wire delete buttons
+                    Array.from(document.querySelectorAll('.delete-btn')).forEach(btn => btn.addEventListener('click', async (e) => {
+                        const uid = e.currentTarget.getAttribute('data-uid');
+                        if (!confirm('Delete user ' + uid + '?')) return;
+                        try {
+                            const delResp = await fetch('/api/auth/user/' + encodeURIComponent(uid), { method: 'DELETE', headers: { Authorization: 'Bearer ' + token } });
+                            if (delResp.ok) {
+                                loadUsersWithToken(token);
+                            } else {
+                                const t = await delResp.text().catch(()=>'');
+                                alert('Delete failed: ' + delResp.status + ' ' + t);
+                            }
+                        } catch (err) {
+                            alert('Delete error: ' + err.message);
+                        }
+                    }));
+                } catch (err) {
+                    tbody.innerHTML = `<tr><td colspan="3">Error loading users: ${err.message}</td></tr>`;
+                }
+            }
+        })();
+    </script>
+</body>
+</html>

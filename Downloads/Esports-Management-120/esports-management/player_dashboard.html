@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Esportify | Player Dashboard</title>
+  <link rel="stylesheet" href="css/player_dashboard.css">
+  <link rel="stylesheet" href="css/dashboard-loading.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+  <!-- Loading Screen - Exact Admin Dashboard Style -->
+  <div class="dashboard-loader" id="dashboardLoader">
+    <div class="loader-content">
+      <div class="loader-logo">
+        <i class="fas fa-gamepad"></i>
+      </div>
+      <div class="loader-text">Loading Player Dashboard</div>
+      <div class="progress-bar">
+        <div class="progress-fill"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-container">
+    <div class="sidebar">
+      <div class="logo"><span>Esportify</span></div>
+      <div class="player-info">
+        <div class="avatar"><img src="images/logo.png" alt="Player Avatar"></div>
+        <h3 id="player-name-sidebar">Player Name</h3>
+        <p class="role">Role</p>
+        <p class="team">Team Name</p>
+      </div>
+      <nav class="nav-menu">
+        <ul>
+          <li><a href="player/view_profile.html">My Profile</a></li>
+          <li><a href="player/view_tournaments.html">Tournaments</a></li>
+          <li><a href="player/match_schedules.html">Match Schedule</a></li>
+          <li class="logout"><a href="logout.html">Logout</a></li>
+          
+        </ul>
+      </nav>
+      
+    </div>
+
+    <div class="main-content">
+      <header>
+        <div class="toggle-menu"><i class="fas fa-bars"></i></div>
+        <div class="header-right"><span id="player-name-header">Player Name</span></div>
+      </header>
+
+      <div class="dashboard-content">
+        <div class="welcome-message">
+          <h1>Welcome back, <span id="player-name-welcome">Player Name</span></h1>
+          <p>Here's your latest stats and upcoming matches</p>
+          <p id="current-date"></p>
+        </div>
+
+        <div class="stats-overview fade-in" id="stats-overview">
+          <!-- Stats cards inserted here -->
+        </div>
+
+        <div class="dashboard-grid">
+          <div class="grid-item upcoming-matches fade-in" id="upcoming-matches">
+            <!-- Upcoming matches inserted here -->
+          </div>
+
+          <div class="grid-item team-info fade-in" id="my-team">
+            <!-- Team info inserted here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Loading Animation Controller - Exact Admin Dashboard Style
+    document.addEventListener('DOMContentLoaded', function() {
+      const dashboardLoader = document.getElementById('dashboardLoader');
+      const fadeElements = document.querySelectorAll('.fade-in');
+      
+      // Show loading screen initially
+      dashboardLoader.style.display = 'flex';
+      
+      // Simulate loading time and then show content
+      setTimeout(() => {
+        // Hide loading screen
+        dashboardLoader.style.opacity = '0';
+        dashboardLoader.style.visibility = 'hidden';
+        
+        // Trigger fade-in animations with staggered delays
+        fadeElements.forEach((element, index) => {
+          setTimeout(() => {
+            element.classList.add('visible');
+          }, index * 150); // 150ms delay between each element
+        });
+      }, 2000); // 2 second loading simulation
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+        // Load Player Stats
+        const statsEl = document.getElementById("stats-overview");
+        statsEl.innerHTML = `
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fas fa-crosshairs"></i></div>
+              <div class="stat-info"><h3>Avg. Kills</h3><h2>5.2</h2></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fas fa-skull"></i></div>
+              <div class="stat-info"><h3>Avg. Deaths</h3><h2>2.8</h2></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
+              <div class="stat-info"><h3>Win Rate</h3><h2>65%</h2></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon"><i class="fas fa-star"></i></div>
+              <div class="stat-info"><h3>Rating</h3><h2>8.7</h2></div>
+            </div>
+        `;
+    
+        // Upcoming Matches
+        const matchesEl = document.getElementById("upcoming-matches");
+        matchesEl.innerHTML = `
+            <div class="match-card">
+              <div class="match-header">
+                <span class="tournament">Champions Cup</span>
+                <span class="date">Sep 30, 15:00</span>
+              </div>
+              <div class="teams">
+                <div class="team"><span class="team-name">Team Alpha</span></div>
+                <div class="vs">VS</div>
+                <div class="team"><span class="team-name">Team Beta</span></div>
+              </div>
+            </div>
+        `;
+    
+        // Team Info
+        const teamEl = document.getElementById("my-team");
+        teamEl.innerHTML = `
+            <div class="team-card">
+              <div class="team-header">
+                <div class="team-logo"><img src="images/default_team_logo.png" alt="Team Logo"></div>
+                <div class="team-name">
+                  <h3>Team Alpha</h3>
+                  <p>Member since Jan 2024</p>
+                </div>
+              </div>
+              <div class="team-status">
+                <div class="status-item"><span class="label">Role</span><span class="value">Player</span></div>
+                <div class="status-item"><span class="label">Status</span><span class="value active">Active</span></div>
+              </div>
+            </div>
+        `;
+    });
+    </script>
+    
+</body>
+</html>

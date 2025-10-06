@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Match Schedules</title>
+    <link rel="stylesheet" href="../css_manager/manage_your_team.css">
+</head>
+<body>
+<div class="match-schedules-container">
+    <h2>Your Match Schedules</h2>
+
+    <table class="match-table" id="matchTable">
+        <thead>
+            <tr>
+                <th>Match Date</th>
+                <th>Opponent Team</th>
+                <th>Result</th>
+            </tr>
+        </thead>
+        <tbody id="matchTableBody"></tbody>
+    </table>
+
+    <p id="noMatches" style="display:none;">No matches found for your team.</p>
+
+    <a href="../player_dashboard.html" class="button">← Back to Dashboard</a>
+
+
+
+</div>
+
+<script>
+    // Simulated player info and matches (replace with API/backend integration)
+    const playerTeam = { team_id: 1, team_name: "Alpha Team" };
+    const matches = [
+        { match_date: "2025-09-30 15:00", team1: "Alpha Team", team2: "Beta Team", result: "Alpha Team won" },
+        { match_date: "2025-10-05 17:00", team1: "Gamma Team", team2: "Alpha Team", result: null }
+    ];
+
+    const tbody = document.getElementById("matchTableBody");
+    const noMatches = document.getElementById("noMatches");
+
+    if (matches.length === 0) {
+        document.getElementById("matchTable").style.display = "none";
+        noMatches.style.display = "block";
+    } else {
+        matches.forEach(match => {
+            const tr = document.createElement("tr");
+
+            const opponent = match.team1 === playerTeam.team_name ? match.team2 : match.team1;
+            const resultText = match.result ?? 'N/A';
+
+            tr.innerHTML = `
+                <td>${match.match_date}</td>
+                <td>${opponent}</td>
+                <td>${resultText}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+</script>
+</body>
+</html>

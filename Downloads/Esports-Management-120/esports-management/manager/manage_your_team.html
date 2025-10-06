@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Your Team</title>
+    <link rel="stylesheet" href="../css_manager/manage_your_team.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Manage Your Team</h1>
+        <p>Welcome, Team Manager! You are managing the team: <strong>Team Name</strong></p>
+        
+        <div class="actions">
+            <a href="add_player.html?team_id=1" class="btn">Add Player</a>
+            <a href="../manager_dashboard.html" class="btn back-btn">Back to Dashboard</a>
+        </div>
+        <div id="players-list"></div>
+
+        <h2>Players:</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Average Rating</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="players-tbody"></tbody>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyDUFqfDlyZF_aA18Dc7ytirEja6E2rFCgQ",
+        authDomain: "esports-62899.firebaseapp.com",
+        databaseURL: "https://esports-62899-default-rtdb.firebaseio.com",
+        projectId: "esports-62899",
+        storageBucket: "esports-62899.appspot.com",
+        messagingSenderId: "561025327999",
+        appId: "1:561025327999:web:76a25a1f580903263ff04a",
+        measurementId: "G-ZRLL1WY4D7"
+    };
+
+    if (!window.firebase || !firebase.apps || firebase.apps.length === 0) {
+        firebase.initializeApp(firebaseConfig);
+    }
+
+    const rtdb = firebase.database();
+
+    function renderPlayers(playersObj) {
+        const tbody = document.getElementById('players-tbody');
+        tbody.innerHTML = '';
+
+        const entries = playersObj ? Object.entries(playersObj) : [];
+        if (entries.length === 0) {
+            tbody.innerHTML = "<tr><td colspan='4'>No players added yet.</td></tr>";
+            return;
+        }
+
+        entries.forEach(([key, p], index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${p.username || ''}</td>
+                <td>${p.role || ''}</td>
+                <td>${p.avg_rating || ''}</td>
+                <td>
+                    <a href="edit_player.html?player_id=${key}" class="btn">Edit</a>
+                    <a href="#" class="btn" onclick="if(confirm('Are you sure?')){ removePlayer('${key}'); } return false;">Delete</a>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    function removePlayer(key) {
+        rtdb.ref('players/' + key).remove().catch(err => console.error('Delete failed', err));
+    }
+
+    // Listeners for RTDB players
+    rtdb.ref('players').on('value', snapshot => {
+        renderPlayers(snapshot.val());
+    }, err => console.error('RTDB read error', err));
+</script>
+
+        </table>
+    </div>
+    <script>
+        // Render player cards from RTDB - re-use rtdb listener used for table
+        function renderPlayerCards(playersObj) {
+            const container = document.getElementById('players-list');
+            const entries = playersObj ? Object.values(playersObj) : [];
+            if (entries.length === 0) {
+                container.innerHTML = '<p>No players added yet.</p>';
+                return;
+            }
+
+            container.innerHTML = entries.map(p => `
+                <div class="player-card">
+                    <h3>${p.username || ''}</h3>
+                    <p>Role: ${p.role || ''}</p>
+                    <p>Rating: ${p.avg_rating || ''}</p>
+                    <p>Join Date: ${p.join_date || ''}</p>
+                    <p>User ID: ${p.user_id || ''}</p>
+                </div>
+            `).join('');
+        }
+
+        // Reuse RTDB listener to update cards too
+        rtdb.ref('players').on('value', snapshot => {
+            renderPlayers(snapshot.val());
+            renderPlayerCards(snapshot.val());
+        });
+    </script>
+      
+    
+      
+</body>
+</html>

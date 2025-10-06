@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Matches</title>
+    <link rel="stylesheet" href="../css/manage_matches.css">
+</head>
+<body>
+    <div class="matches-container">
+        <h2>Manage Matches</h2>
+        <a href="add_match.html" class="add-btn">+ Add Match</a>
+        <a href="../admin_dashboard.html" class="back-btn">← Back to Dashboard</a>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Match ID</th>
+                    <th>Tournament ID</th>
+                    <th>Team 1 ID</th>
+                    <th>Team 2 ID</th>
+                    <th>Match Date</th>
+                    <th>Result</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="matchesTableBody"></tbody>
+        </table>
+    </div>
+
+    <script>
+        // Load matches from backend first, fall back to localStorage
+        async function loadMatches() {
+            const tbody = document.getElementById("matchesTableBody");
+            tbody.innerHTML = "";
+            try {
+                const resp = await fetch('/api/match');
+                if (resp.ok) {
+                    const data = await resp.json();
+                    const entries = Object.entries(data || {});
+                    if (entries.length === 0) {
+                        tbody.innerHTML = "<tr><td colspan='7'>No matches found.</td></tr>";
+                        return;
+                    }
+                    entries.forEach(([key, match]) => {
+                        const tr = document.createElement("tr");
+                        tr.innerHTML = `
+                            <td>${key}</td>
+                            <td>${match.tournament_id || ''}</td>
+                            <td>${match.team1_id || ''}</td>
+                            <td>${match.team2_id || ''}</td>
+                            <td>${match.match_date || ''}</td>
+                            <td>${match.result || ''}</td>
+                            <td>
+                                <a href="edit_match.html?id=${key}" class="edit-btn">Edit</a>
+                                <a href="#" class="delete-btn" onclick="deleteMatch('${key}')">Delete</a>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                    return;
+                }
+            } catch (err) {
+                console.warn('Failed to load matches from backend, falling back to localStorage', err);
+            }
+
+            // Fallback to localStorage
+            try {
+                const matches = JSON.parse(localStorage.getItem("matches")) || [];
+                if (matches.length === 0) {
+                    tbody.innerHTML = "<tr><td colspan='7'>No matches found.</td></tr>";
+                    return;
+                }
+                matches.forEach(match => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                        <td>${match.match_id}</td>
+                        <td>${match.tournament_id}</td>
+                        <td>${match.team1_id}</td>
+                        <td>${match.team2_id}</td>
+                        <td>${match.match_date}</td>
+                        <td>${match.result}</td>
+                        <td>
+                            <a href="edit_match.html?id=${match.match_id}" class="edit-btn">Edit</a>
+                            <a href="#" class="delete-btn" onclick="deleteMatch(${match.match_id})">Delete</a>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (err) {
+                tbody.innerHTML = "<tr><td colspan='7'>No matches found.</td></tr>";
+            }
+        }
+
+        async function deleteMatch(key) {
+            if (!confirm('Are you sure you want to delete this match?')) return;
+            try {
+                const resp = await fetch('/api/match/' + encodeURIComponent(key), { method: 'DELETE' });
+                if (resp.ok) {
+                    loadMatches();
+                    return;
+                }
+            } catch (err) {
+                console.warn('Server delete failed, attempting localStorage delete', err);
+            }
+
+            // Fallback localStorage delete for legacy data
+            try {
+                let matches = JSON.parse(localStorage.getItem('matches')) || [];
+                matches = matches.filter(m => m.match_id !== Number(key));
+                localStorage.setItem('matches', JSON.stringify(matches));
+                loadMatches();
+            } catch (err) {
+                console.error('Delete failed', err);
+            }
+        }
+
+        loadMatches();
+    </script>
+</body>
+</html>

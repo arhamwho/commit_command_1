@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Team Manager Dashboard</title>
+  <link rel="stylesheet" href="css/manager_dashboard.css">
+  <link rel="stylesheet" href="css/dashboard-loading.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  </script>
+</head>
+<body>
+  <!-- Loading Screen - Exact Admin Dashboard Style -->
+  <div class="dashboard-loader" id="dashboardLoader">
+    <div class="loader-content">
+      <div class="loader-logo">
+        <i class="fas fa-gamepad"></i>
+      </div>
+      <div class="loader-text">Loading Manager Dashboard</div>
+      <div class="progress-bar">
+        <div class="progress-fill"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-container">
+    <aside class="sidebar">
+      <div class="team-logo">
+        <div class="logo-placeholder"></div>
+        <div id="team-info">
+          <!-- Team info loaded via JS -->
+        </div>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="manager/manage_your_team.html">Manage Team</a></li>
+          <li><a href="manager/view_schedules.html">Schedules</a></li>
+          <li><a href="manager/reports.html">Reports</a></li>
+          
+          
+<li class="logout"><a href="logout.html">Logout</a></li>
+
+        </ul>
+      </nav>
+      
+    </aside>
+
+    <main class="main-content">
+      <header class="dashboard-header">
+        <div class="welcome-section">
+          <h1>Welcome, <span id="manager-name">Manager</span></h1>
+          <p class="current-date" id="current-date"></p>
+        </div>
+      </header>
+
+      <div class="dashboard-grid">
+        <section class="dashboard-card team-stats fade-in">
+          <div class="card-header"><h2>Team Statistics</h2></div>
+          <div class="card-content" id="team-stats">
+            <!-- Stats loaded via JS -->
+          </div>
+        </section>
+
+        <section class="dashboard-card upcoming-matches fade-in">
+          <div class="card-header">
+            <h2>Upcoming Matches</h2>
+            <a href="#" class="view-all">View All</a>
+          </div>
+          <div class="card-content match-list" id="upcoming-matches">
+            <!-- Matches loaded via JS -->
+          </div>
+        </section>
+
+        <section class="dashboard-card top-players fade-in">
+          <div class="card-header">
+            <h2>Top Performers</h2>
+            <a href="#" class="view-all">View All</a>
+          </div>
+          <div class="card-content player-list" id="top-players">
+            <!-- Players loaded via JS -->
+          </div>
+        </section>
+
+        <section class="dashboard-card recent-tournaments fade-in">
+          <div class="card-header">
+            <h2>Recent Tournaments</h2>
+            <a href="#" class="view-all">View All</a>
+          </div>
+          <div class="card-content tournament-list" id="recent-tournaments">
+            <!-- Tournaments loaded via JS -->
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  
+
+  <script>
+    // Loading Animation Controller - Exact Admin Dashboard Style
+    document.addEventListener('DOMContentLoaded', function() {
+      const dashboardLoader = document.getElementById('dashboardLoader');
+      const fadeElements = document.querySelectorAll('.fade-in');
+      
+      // Show loading screen initially
+      dashboardLoader.style.display = 'flex';
+      
+      // Simulate loading time and then show content
+      setTimeout(() => {
+        // Hide loading screen
+        dashboardLoader.style.opacity = '0';
+        dashboardLoader.style.visibility = 'hidden';
+        
+        // Trigger fade-in animations with staggered delays
+        fadeElements.forEach((element, index) => {
+          setTimeout(() => {
+            element.classList.add('visible');
+          }, index * 150); // 150ms delay between each element
+        });
+      }, 2000); // 2 second loading simulation
+    });
+
+    // Show current date
+    document.getElementById('current-date').innerText = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+
+    // You can now write functions to fetch stats, matches, players, and tournaments from Firebase
+    // Example placeholders
+    document.getElementById('team-stats').innerHTML = `
+      <div class="stat-item"><div class="stat-value">10</div><div class="stat-label">Players</div></div>
+      <div class="stat-item"><div class="stat-value">5</div><div class="stat-label">Wins</div></div>
+      <div class="stat-item"><div class="stat-value">2</div><div class="stat-label">Losses</div></div>
+    `;
+    document.getElementById('upcoming-matches').innerHTML = `<div>No upcoming matches</div>`;
+    document.getElementById('top-players').innerHTML = `<div>No top players</div>`;
+    document.getElementById('recent-tournaments').innerHTML = `<div>No tournaments yet</div>`;
+  </script>
+</body>
+</html>

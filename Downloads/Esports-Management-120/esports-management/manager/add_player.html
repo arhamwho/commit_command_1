@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Player</title>
+    <link rel="stylesheet" href="../css_manager/add_player.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Add Player</h1>
+        <form id="addPlayerForm">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required>
+        
+            <label for="role">Role</label>
+            <input type="text" id="role" name="role" required>
+        
+            <label for="avg_rating">Average Rating</label>
+            <input type="number" step="0.01" id="avg_rating" name="avg_rating" required>
+        
+            <label for="join_date">Join Date</label>
+            <input type="date" id="join_date" name="join_date" required>
+        
+            <label for="user_id">User ID</label>
+            <input type="number" id="user_id" name="user_id" required>
+        
+            <button type="submit" class="btn">Add Player</button>
+        </form>
+        
+        <br>
+        <a href="manage_your_team.html" class="btn back-btn">Back to Dashboard</a>
+    </div>
+
+    <script>
+        // Initialize Firebase client and write player to Firestore
+        (function() {
+            const firebaseConfig = {
+                apiKey: "AIzaSyDUFqfDlyZF_aA18Dc7ytirEja6E2rFCgQ",
+                authDomain: "esports-62899.firebaseapp.com",
+                databaseURL: "https://esports-62899-default-rtdb.firebaseio.com",
+                projectId: "esports-62899",
+                storageBucket: "esports-62899.appspot.com",
+                messagingSenderId: "561025327999",
+                appId: "1:561025327999:web:76a25a1f580903263ff04a",
+                measurementId: "G-ZRLL1WY4D7"
+            };
+
+            // Load Firebase SDKs if not already present
+            const loadScript = (src) => new Promise((res, rej) => {
+                const s = document.createElement('script');
+                s.src = src; s.onload = res; s.onerror = rej; document.head.appendChild(s);
+            });
+
+            Promise.resolve()
+                .then(() => {
+                    if (!window.firebase) return loadScript('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js');
+                    })
+                    .then(() => {
+                        if (!firebase.database) return loadScript('https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js');
+                    })
+                    .then(() => {
+                        if (!firebase.apps || firebase.apps.length === 0) firebase.initializeApp(firebaseConfig);
+                        window.rtdb = firebase.database();
+
+                        document.getElementById('addPlayerForm').addEventListener('submit', async function(e) {
+                            e.preventDefault();
+
+                            const player = {
+                                username: document.getElementById('username').value,
+                                role: document.getElementById('role').value,
+                                avg_rating: Number(document.getElementById('avg_rating').value),
+                                join_date: document.getElementById('join_date').value,
+                                user_id: Number(document.getElementById('user_id').value)
+                            };
+
+                            try {
+                                // Push player to Realtime Database under '/players'
+                                await rtdb.ref('players').push(player);
+                                window.location.href = 'manage_your_team.html';
+                            } catch (err) {
+                                console.error('Error adding player to RTDB:', err);
+                                alert('Failed to add player. Check console for details.');
+                            }
+                        });
+                    })
+                .catch(err => {
+                    console.error('Failed loading Firebase SDKs:', err);
+                    alert('Firebase failed to load. Check console.');
+                });
+        })();
+    </script>
+</body>
+</html>

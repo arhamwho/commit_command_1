@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Delete Team</title>
+  <link rel="stylesheet" href="../css/edit_match.css">
+</head>
+<body>
+  <div class="delete-team-container">
+    <h2>Delete Team</h2>
+    
+    <label for="teamId">Enter Team ID to delete:</label><br>
+    <input type="number" id="teamId" placeholder="Team ID"><br><br>
+
+    <button onclick="deleteTeam()">Delete</button>
+    <a href="manage_teams.html">← Back to Teams</a>
+
+    <div id="message"></div>
+  </div>
+
+  <script>
+    // Fake Teams dataset in localStorage (simulate DB)
+    if (!localStorage.getItem("teams")) {
+      const sampleTeams = [
+        {id: 1, name: "Team Alpha"},
+        {id: 2, name: "Team Beta"},
+        {id: 3, name: "Team Gamma"}
+      ];
+      localStorage.setItem("teams", JSON.stringify(sampleTeams));
+    }
+
+    function deleteTeam() {
+      const teamId = parseInt(document.getElementById("teamId").value);
+      let teams = JSON.parse(localStorage.getItem("teams")) || [];
+
+      const index = teams.findIndex(t => t.id === teamId);
+      if (index !== -1) {
+        teams.splice(index, 1);
+        localStorage.setItem("teams", JSON.stringify(teams));
+        document.getElementById("message").innerText =
+          `✅ Team with ID ${teamId} deleted successfully!`;
+        // Simulate redirect like PHP
+        setTimeout(() => {
+          window.location.href = "manage_teams.html";
+        }, 1500);
+      } else {
+        document.getElementById("message").innerText =
+          `❌ Team ID ${teamId} not found.`;
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Teams</title>
+    <link rel="stylesheet" href="../css/manage_teams.css">
+</head>
+<body>
+    <div class="team-container">
+        <h2>Manage Teams</h2>
+        <a href="add_team.html" class="add-btn">+ Add Team</a>
+        <a href="../admin_dashboard.html" class="back-btn">← Back to Dashboard</a>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Team ID</th>
+                    <th>Team Name</th>
+                    <th>Logo</th>
+                    <th>Manager ID</th>
+                    <th>Creation Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="teamsTableBody"></tbody>
+        </table>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDUFqfDlyZF_aA18Dc7ytirEja6E2rFCgQ",
+            authDomain: "esports-62899.firebaseapp.com",
+            databaseURL: "https://esports-62899-default-rtdb.firebaseio.com",
+            projectId: "esports-62899",
+            storageBucket: "esports-62899.appspot.com",
+            messagingSenderId: "561025327999",
+            appId: "1:561025327999:web:76a25a1f580903263ff04a",
+            measurementId: "G-ZRLL1WY4D7"
+        };
+
+        if (!window.firebase || !firebase.apps || firebase.apps.length === 0) {
+            firebase.initializeApp(firebaseConfig);
+        }
+
+        const rtdb = firebase.database();
+
+        function renderTeams(teamsObj) {
+            const tbody = document.getElementById("teamsTableBody");
+            tbody.innerHTML = "";
+
+            const entries = teamsObj ? Object.entries(teamsObj) : [];
+            if (entries.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='6'>No teams found.</td></tr>";
+                return;
+            }
+
+            entries.forEach(([key, team], index) => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${team.name || ''}</td>
+                    <td>${team.logo || ''}</td>
+                    <td>${team.manager_id || ''}</td>
+                    <td>${team.creation_date || ''}</td>
+                    <td>
+                        <a href="edit_team.html?id=${key}" class="edit-btn">Edit</a>
+                        <a href="#" class="delete-btn" onclick="deleteTeam('${key}')">Delete</a>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function deleteTeam(key) {
+            if (!confirm('Are you sure you want to delete this team?')) return;
+            rtdb.ref('Team/' + key).remove().catch(err => console.error('Delete failed', err));
+        }
+
+        // Listen for changes
+        rtdb.ref('Team').on('value', snapshot => {
+            renderTeams(snapshot.val());
+        }, err => console.error('RTDB read error', err));
+    </script>
+</body>
+</html>

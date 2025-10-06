@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>View Tournaments</title>
+<link rel="stylesheet" href="../css_player/view_tournaments.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+<div class="tournaments-container">
+    <h2>Tournaments Involved</h2>
+    <table class="tournament-table" id="tournamentTable">
+        <thead>
+            <tr>
+                <th>Tournament Name</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Rows will be inserted here by JS -->
+        </tbody>
+    </table>
+    <p id="noTournamentsMessage" style="display:none;">No tournaments found for your team.</p>
+
+    <a href="../player_dashboard.html" class="button">← Back to Dashboard</a>
+</div>
+
+<script>
+    // Sample tournament data
+    const tournaments = [
+        { name: "Spring Championship", start_date: "2025-03-01", end_date: "2025-03-15", status: "Ongoing" },
+        { name: "Summer Cup", start_date: "2025-06-10", end_date: "2025-06-25", status: "Upcoming" },
+        { name: "Autumn League", start_date: "2024-09-05", end_date: "2024-09-20", status: "Completed" }
+    ];
+
+    const tableBody = document.querySelector("#tournamentTable tbody");
+    const noMessage = document.getElementById("noTournamentsMessage");
+
+    if (tournaments.length > 0) {
+        tournaments.forEach(t => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${t.name}</td>
+                <td>${t.start_date}</td>
+                <td>${t.end_date}</td>
+                <td>${t.status}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    } else {
+        document.getElementById("tournamentTable").style.display = "none";
+        noMessage.style.display = "block";
+    }
+</script>
+</body>
+</html>

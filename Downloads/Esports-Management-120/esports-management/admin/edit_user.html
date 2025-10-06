@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit User</title>
+  <link rel="stylesheet" href="../css/edit_user.css">
+</head>
+<body>
+  <div class="edit-user-container">
+    <h2>Edit User</h2>
+
+    <label for="userId">Enter User ID to edit:</label><br>
+    <input type="number" id="userId" placeholder="User ID"><br><br>
+    <button onclick="loadUser()">Load User</button>
+
+    <form id="editForm" style="display:none;" onsubmit="updateUser(event)">
+      <label>Email:</label>
+      <input type="email" id="email" required><br>
+
+      <label>Role:</label>
+      <select id="role" required>
+        <option value="admin">Admin</option>
+        <option value="team_manager">Team Manager</option>
+        <option value="player">Player</option>
+        <option value="spectator">Spectator</option>
+      </select><br>
+
+      <label>New Password (leave blank to keep current):</label>
+      <input type="text" id="password" placeholder="Enter new password"><br><br>
+
+      <button type="submit">Update User</button>
+      <a href="manage_users.html">← Back to Manage Users</a>
+    </form>
+
+    <div id="message"></div>
+  </div>
+
+  <script>
+    // Initialize sample users if not present
+    if (!localStorage.getItem("users")) {
+      const sampleUsers = [
+        {id:1,email:"admin@example.com",role:"admin",password:"123"},
+        {id:2,email:"manager@example.com",role:"team_manager",password:"123"},
+        {id:3,email:"player@example.com",role:"player",password:"123"}
+      ];
+      localStorage.setItem("users", JSON.stringify(sampleUsers));
+    }
+
+    let currentUser = null;
+
+    function loadUser() {
+      const userId = parseInt(document.getElementById("userId").value);
+      const users = JSON.parse(localStorage.getItem("users"));
+      currentUser = users.find(u => u.id === userId);
+
+      if (currentUser) {
+        document.getElementById("editForm").style.display = "block";
+        document.getElementById("email").value = currentUser.email;
+        document.getElementById("role").value = currentUser.role;
+        document.getElementById("password").value = "";
+        document.getElementById("message").innerText = "";
+      } else {
+        document.getElementById("message").innerText = "❌ User not found.";
+        document.getElementById("editForm").style.display = "none";
+      }
+    }
+
+    function updateUser(e) {
+      e.preventDefault();
+      const users = JSON.parse(localStorage.getItem("users"));
+      const index = users.findIndex(u => u.id === currentUser.id);
+
+      if (index !== -1) {
+        const newPassword = document.getElementById("password").value;
+        users[index] = {
+          id: currentUser.id,
+          email: document.getElementById("email").value,
+          role: document.getElementById("role").value,
+          password: newPassword ? newPassword : currentUser.password // Keep old if blank
+        };
+        localStorage.setItem("users", JSON.stringify(users));
+        document.getElementById("message").innerText = "✅ User updated successfully!";
+        setTimeout(()=>{ window.location.href="manage_users.html"; }, 1500);
+      }
+    }
+  </script>
+</body>
+</html>

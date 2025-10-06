@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>View Players</title>
+  <link rel="stylesheet" href="../css_spectator/view_players.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+<div class="container">
+  <h2>Select a Team to View Players</h2>
+
+  <form id="teamForm">
+    <select id="teamSelect">
+      <option value="">-- Select Team --</option>
+    </select>
+  </form>
+
+  <div id="playersSection" style="display:none;">
+    <h3>Players in Selected Team</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Role</th>
+          <th>Join Date</th>
+          <th>Avg Rating</th>
+          <th>Total Kills</th>
+          <th>Total Deaths</th>
+          <th>Avg Win Rate (%)</th>
+        </tr>
+      </thead>
+      <tbody id="playersTableBody">
+        <!-- Filled by JS -->
+      </tbody>
+    </table>
+  </div>
+
+  <p id="noPlayersMsg" style="display:none;">No players found for this team.</p>
+
+  <a href="../spectator_dashboard.html" class="back-btn">← Back to Dashboard</a>
+</div>
+
+<script>
+  // Sample teams
+  const teams = [
+    { team_id: 1, name: "Team Alpha" },
+    { team_id: 2, name: "Team Beta" },
+    { team_id: 3, name: "Team Gamma" }
+  ];
+
+  // Sample players data grouped by team_id
+  const playersData = {
+    1: [
+      { username: "Player1", role: "Sniper", join_date: "2023-02-15", avg_rating: 4.5, total_kills: 230, total_deaths: 120, avg_win_rate: 65 },
+      { username: "Player2", role: "Support", join_date: "2023-05-01", avg_rating: 4.0, total_kills: 180, total_deaths: 150, avg_win_rate: 55 }
+    ],
+    2: [
+      { username: "Player3", role: "Leader", join_date: "2024-01-10", avg_rating: 4.8, total_kills: 300, total_deaths: 100, avg_win_rate: 70 }
+    ],
+    3: [] // No players
+  };
+
+  const teamSelect = document.getElementById("teamSelect");
+  const playersTableBody = document.getElementById("playersTableBody");
+  const playersSection = document.getElementById("playersSection");
+  const noPlayersMsg = document.getElementById("noPlayersMsg");
+
+  // Populate team dropdown
+  teams.forEach(team => {
+    const opt = document.createElement("option");
+    opt.value = team.team_id;
+    opt.textContent = team.name;
+    teamSelect.appendChild(opt);
+  });
+
+  // Handle team selection
+  teamSelect.addEventListener("change", () => {
+    const selectedTeamId = teamSelect.value;
+    playersTableBody.innerHTML = "";
+    playersSection.style.display = "none";
+    noPlayersMsg.style.display = "none";
+
+    if (selectedTeamId) {
+      const players = playersData[selectedTeamId] || [];
+      if (players.length > 0) {
+        players.forEach(player => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${player.username}</td>
+            <td>${player.role}</td>
+            <td>${player.join_date}</td>
+            <td>${player.avg_rating}</td>
+            <td>${player.total_kills}</td>
+            <td>${player.total_deaths}</td>
+            <td>${player.avg_win_rate}</td>
+          `;
+          playersTableBody.appendChild(tr);
+        });
+        playersSection.style.display = "block";
+      } else {
+        noPlayersMsg.style.display = "block";
+      }
+    }
+  });
+</script>
+</body>
+</html>

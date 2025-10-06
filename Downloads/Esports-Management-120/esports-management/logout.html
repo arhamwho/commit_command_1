@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Logout - Esports Management</title>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+    <p>Logging out...</p>
+
+    <script>
+        // Firebase config (replace with your config)
+        const firebaseConfig = {
+      apiKey: "AIzaSyDUFqfDlyZF_aA18Dc7ytirEja6E2rFCgQ",
+      authDomain: "esports-62899.firebaseapp.com",
+      databaseURL: "https://esports-62899-default-rtdb.firebaseio.com",
+      projectId: "esports-62899",
+      storageBucket: "esports-62899.appspot.com",  // ✅ fixed
+      messagingSenderId: "561025327999",
+      appId: "1:561025327999:web:76a25a1f580903263ff04a",
+      measurementId: "G-ZRLL1WY4D7"
+    };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // Sign out and redirect to login page
+        auth.signOut().then(() => {
+            window.location.href = 'login.html';
+        }).catch((error) => {
+            console.error("Logout error:", error);
+            window.location.href = 'login.html';
+        });
+    </script>
+</body>
+</html>

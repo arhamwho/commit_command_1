@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <link rel="stylesheet" href="css/login.css" />
+  <h2>Login</h2>
+  <form id="loginForm">
+    <input type="email" id="email" placeholder="Email" required><br><br>
+    <input type="password" id="password" placeholder="Password" required><br><br>
+    <button type="submit">Login</button>
+  </form>
+  <p id="error" style="color:red;"></p>
+
+  <script>
+    // ✅ Firebase config (replace with your project’s config)
+    const firebaseConfig = {
+      apiKey: "AIzaSyDUFqfDlyZF_aA18Dc7ytirEja6E2rFCgQ",
+      authDomain: "esports-62899.firebaseapp.com",
+      databaseURL: "https://esports-62899-default-rtdb.firebaseio.com",
+      projectId: "esports-62899",
+      storageBucket: "esports-62899.appspot.com",  // ✅ fixed
+      messagingSenderId: "561025327999",
+      appId: "1:561025327999:web:76a25a1f580903263ff04a",
+      measurementId: "G-ZRLL1WY4D7"
+
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    // ✅ Handle login
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const errorEl = document.getElementById("error");
+
+      if (!email || !password) {
+        errorEl.textContent = "Please enter both email and password.";
+        return;
+      }
+
+      try {
+        // Sign in with Firebase Auth
+        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+
+        // Get ID token and call backend to fetch profile (server reads RTDB)
+        const idToken = await user.getIdToken();
+        const resp = await fetch('http://localhost:3000/api/user', {
+          headers: { Authorization: 'Bearer ' + idToken }
+        });
+        if (!resp.ok) {
+          const txt = await resp.text().catch(()=>'');
+          errorEl.textContent = 'Failed to fetch profile: ' + (txt || resp.status);
+          return;
+        }
+        const profile = await resp.json();
+        const role = profile.role;
+
+        if (role === "admin") {
+          window.location.href = "admin_dashboard.html";
+        } else if (role === "team_manager") {
+          window.location.href = "manager_dashboard.html";
+        } else if (role === "player") {
+          window.location.href = "player_dashboard.html";
+        } else if (role === "spectator") {
+          window.location.href = "spectator_dashboard.html";
+        } else {
+          errorEl.textContent = "Unknown role.";
+        }
+      } catch (err) {
+        errorEl.textContent = err.message;
+      }
+    });
+  </script>
+</body>
+</html>

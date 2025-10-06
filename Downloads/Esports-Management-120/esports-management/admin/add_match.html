@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Match</title>
+    <link rel="stylesheet" href="../css/add_match.css">
+</head>
+<body>
+    <div class="add-match-container">
+        <h2>Add New Match</h2>
+        <form id="addMatchForm">
+            <label>Tournament ID:</label>
+            <input type="number" name="tournament_id" id="tournamentId" required>
+
+            <label>Team 1 ID:</label>
+            <input type="number" name="team1_id" id="team1Id" required>
+
+            <label>Team 2 ID:</label>
+            <input type="number" name="team2_id" id="team2Id" required>
+
+            <label>Match Date:</label>
+            <input type="datetime-local" name="match_date" id="matchDate" required>
+
+            <label>Result:</label>
+            <input type="text" name="result" id="result" placeholder="e.g. Team 1 won" required>
+
+            <button type="submit">Add Match</button>
+            <a href="../admin_dashboard.html" class="back-btn">Back</a>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById("addMatchForm");
+
+        form.addEventListener("submit", async function(e) {
+            e.preventDefault(); // Prevent form submission
+
+            // Create a new match object
+            const newMatch = {
+                tournament_id: parseInt(document.getElementById("tournamentId").value),
+                team1_id: parseInt(document.getElementById("team1Id").value),
+                team2_id: parseInt(document.getElementById("team2Id").value),
+                match_date: document.getElementById("matchDate").value,
+                result: document.getElementById("result").value
+            };
+
+            // Primary: post to backend
+            try {
+                console.log('Posting match to backend', newMatch);
+                const resp = await fetch('/api/match', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newMatch)
+                });
+                const data = await resp.json().catch(()=>({raw: 'invalid json'}));
+                console.log('Backend response', resp.status, data);
+                if (resp.ok) {
+                    window.location.href = 'manage_matches.html';
+                    return;
+                }
+            } catch (err) {
+                console.warn('Backend post failed, falling back to localStorage & client RTDB', err);
+            }
+
+            // Fallback: localStorage
+            try {
+                let matches = JSON.parse(localStorage.getItem("matches")) || [];
+                matches.push(newMatch);
+                localStorage.setItem("matches", JSON.stringify(matches));
+                window.location.href = "manage_matches.html";
+            } catch (err) {
+                console.error('Fallback save failed', err);
+                alert('Failed to save match. Check console.');
+            }
+        });
+    </script>
+</body>
+</html>

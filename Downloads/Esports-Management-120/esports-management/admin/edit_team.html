@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Team</title>
+  <link rel="stylesheet" href="../css/edit_team.css">
+</head>
+<body>
+  <div class="edit-team-container">
+    <h2>Edit Team</h2>
+
+    <label for="teamId">Enter Team ID to edit:</label><br>
+    <input type="number" id="teamId" placeholder="Team ID"><br><br>
+    <button onclick="loadTeam()">Load Team</button>
+
+    <form id="editForm" style="display:none;" onsubmit="updateTeam(event)">
+      <label>Team Name:</label>
+      <input type="text" id="name" required><br>
+
+      <label>Logo:</label>
+      <input type="text" id="logo"><br>
+
+      <label>Manager ID:</label>
+      <input type="number" id="manager_id" required><br>
+
+      <label>Creation Date:</label>
+      <input type="date" id="creation_date" required><br><br>
+
+      <button type="submit">Update Team</button>
+      <a href="manage_teams.html">← Back</a>
+    </form>
+
+    <div id="message"></div>
+  </div>
+
+  <script>
+    // Initialize sample teams if not present
+    if (!localStorage.getItem("teams")) {
+      const sampleTeams = [
+        {id:1, name:"Team Alpha", logo:"alpha.png", manager_id:101, creation_date:"2025-01-01"},
+        {id:2, name:"Team Beta", logo:"beta.png", manager_id:102, creation_date:"2025-02-15"}
+      ];
+      localStorage.setItem("teams", JSON.stringify(sampleTeams));
+    }
+
+    let currentTeam = null;
+
+    function loadTeam() {
+      const teamId = parseInt(document.getElementById("teamId").value);
+      const teams = JSON.parse(localStorage.getItem("teams"));
+      currentTeam = teams.find(t => t.id === teamId);
+
+      if (currentTeam) {
+        document.getElementById("editForm").style.display = "block";
+        document.getElementById("name").value = currentTeam.name;
+        document.getElementById("logo").value = currentTeam.logo;
+        document.getElementById("manager_id").value = currentTeam.manager_id;
+        document.getElementById("creation_date").value = currentTeam.creation_date;
+        document.getElementById("message").innerText = "";
+      } else {
+        document.getElementById("message").innerText = "❌ Team not found.";
+        document.getElementById("editForm").style.display = "none";
+      }
+    }
+
+    function updateTeam(e) {
+      e.preventDefault();
+      const teams = JSON.parse(localStorage.getItem("teams"));
+      const index = teams.findIndex(t => t.id === currentTeam.id);
+
+      if (index !== -1) {
+        teams[index] = {
+          id: currentTeam.id,
+          name: document.getElementById("name").value,
+          logo: document.getElementById("logo").value,
+          manager_id: parseInt(document.getElementById("manager_id").value),
+          creation_date: document.getElementById("creation_date").value
+        };
+        localStorage.setItem("teams", JSON.stringify(teams));
+        document.getElementById("message").innerText = "✅ Team updated successfully!";
+        setTimeout(() => { window.location.href = "manage_teams.html"; }, 1500);
+      }
+    }
+  </script>
+</body>
+</html>

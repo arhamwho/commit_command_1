@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Player</title>
+    <link rel="stylesheet" href="../css_manager/edit_player.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Edit Player</h1>
+
+        <!-- Messages that were shown via PHP sessions -->
+        <div class="success">Player updated successfully!</div>
+        <div class="error">Error updating player.</div>
+
+        <form id="editPlayerForm">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" value="" required>
+
+            <label for="role">Role:</label>
+            <input type="text" id="role" name="role" value="" required>
+
+            <label for="join_date">Join Date:</label>
+            <input type="date" id="join_date" name="join_date" value="" required>
+
+            <label for="avg_rating">Avg. Rating:</label>
+            <input type="number" id="avg_rating" name="avg_rating" step="0.01" min="0" max="5" value="" required>
+
+            <input type="submit" value="Update Player">
+        </form>
+        <br>
+        <a href="manage_your_team.html" class="btn back-btn">Back to Dashboard</a>
+    </div>
+
+    <script>
+        // Use RTDB key passed in URL as player_id
+        const urlParams = new URLSearchParams(window.location.search);
+        const playerKey = urlParams.get('player_id');
+
+        // Initialize Firebase RTDB (reuse same config)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDUFqfDlyZF_aA18Dc7ytirEja6E2rFCgQ",
+            authDomain: "esports-62899.firebaseapp.com",
+            databaseURL: "https://esports-62899-default-rtdb.firebaseio.com",
+            projectId: "esports-62899",
+            storageBucket: "esports-62899.appspot.com",
+            messagingSenderId: "561025327999",
+            appId: "1:561025327999:web:76a25a1f580903263ff04a",
+            measurementId: "G-ZRLL1WY4D7"
+        };
+
+        if (!window.firebase || !firebase.apps || firebase.apps.length === 0) {
+            const s1 = document.createElement('script'); s1.src = 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js'; document.head.appendChild(s1);
+            const s2 = document.createElement('script'); s2.src = 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js'; document.head.appendChild(s2);
+            s2.onload = () => {
+                firebase.initializeApp(firebaseConfig);
+                loadPlayer();
+            };
+        } else {
+            firebase.initializeApp(firebaseConfig);
+            loadPlayer();
+        }
+
+        function loadPlayer() {
+            if (!playerKey) {
+                alert('No player_id provided');
+                window.location.href = 'manage_your_team.html';
+                return;
+            }
+            const rtdb = firebase.database();
+            rtdb.ref('players/' + playerKey).once('value').then(snap => {
+                const p = snap.val();
+                if (!p) {
+                    alert('Player not found!');
+                    window.location.href = 'manage_your_team.html';
+                    return;
+                }
+                document.getElementById('username').value = p.username || '';
+                document.getElementById('role').value = p.role || '';
+                document.getElementById('join_date').value = p.join_date || '';
+                document.getElementById('avg_rating').value = p.avg_rating || '';
+            }).catch(err => { console.error('Load player error', err); alert('Error loading player'); });
+
+            document.getElementById('editPlayerForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const updates = {
+                    username: document.getElementById('username').value,
+                    role: document.getElementById('role').value,
+                    join_date: document.getElementById('join_date').value,
+                    avg_rating: Number(document.getElementById('avg_rating').value)
+                };
+                firebase.database().ref('players/' + playerKey).update(updates).then(() => {
+                    window.location.href = 'manage_your_team.html';
+                }).catch(err => { console.error('Update failed', err); alert('Update failed'); });
+            });
+        }
+    </script>
+
+</body>
+</html>

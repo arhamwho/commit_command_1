@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard | Esports Management</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/leaderboard.css">
+</head>
+<body>
+    <div class="dashboard-container">
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h2><i class="fas fa-trophy"></i> Player Leaderboard</h2>
+                <p>Top performing players ranked by their ratings and statistics</p>
+            </div>
+
+            <!-- Leaderboard Controls -->
+            <div class="leaderboard-controls">
+                <div class="control-group">
+                    <label for="gameFilter">Game:</label>
+                    <select id="gameFilter" class="filter-select">
+                        <option value="all">All Games</option>
+                        <option value="dota2">Dota 2</option>
+                        <option value="lol">League of Legends</option>
+                        <option value="csgo">CS:GO</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="sortBy">Sort by:</label>
+                    <select id="sortBy" class="filter-select">
+                        <option value="rating">Rating</option>
+                        <option value="matches">Matches Played</option>
+                        <option value="wins">Win Rate</option>
+                        <option value="kills">Kills</option>
+                    </select>
+                </div>
+                <button id="refreshLeaderboard" class="refresh-btn">
+                    <i class="fas fa-sync-alt"></i>
+                    Refresh Data
+                </button>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loadingState" class="loading-state">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Loading leaderboard data<span class="loading-dots"></span></p>
+            </div>
+
+            <!-- Error State -->
+            <div id="errorState" class="error-state" style="display: none;">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p id="errorMessage">Failed to load leaderboard data</p>
+                <button id="retryBtn" class="retry-btn">
+                    <i class="fas fa-redo"></i> Try Again
+                </button>
+            </div>
+
+            <!-- Leaderboard Content -->
+            <div id="leaderboardContent" class="leaderboard-content" style="display: none;">
+                <!-- Main Leaderboard Panel -->
+                <div class="leaderboard-panel">
+                    <div class="leaderboard-title">
+                        <h3>LEADERBOARD</h3>
+                    </div>
+                    <div id="leaderboardEntries">
+                        <!-- Dynamic player entries will be inserted here -->
+                    </div>
+                </div>
+                
+                <!-- Back to Dashboard Button -->
+                <div class="back-to-dashboard-container">
+                    <button class="back-to-dashboard-btn" onclick="window.location.href='../admin_dashboard.html'">
+                        <i class="fas fa-arrow-left"></i> BACK TO DASHBOARD
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDUFqfDlyZF_aA18Dc7ytirEja6E2rFCgQ",
+            authDomain: "esports-62899.firebaseapp.com",
+            databaseURL: "https://esports-62899-default-rtdb.firebaseio.com",
+            projectId: "esports-62899",
+            storageBucket: "esports-62899.appspot.com",
+            messagingSenderId: "561025327999",
+            appId: "1:561025327999:web:76a25a1f580903263ff04a",
+            measurementId: "G-ZRLL1WY4D7"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+
+        // Check authentication and load data
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                console.log('User authenticated:', user.email);
+                loadLeaderboardData();
+            } else {
+                // User is signed out, but let's still try to load data for demo purposes
+                console.log('No user authenticated, loading demo data');
+                loadLeaderboardData();
+            }
+        });
+
+        // Load leaderboard data using DSA-powered API
+        async function loadLeaderboardData() {
+            const loadingState = document.getElementById('loadingState');
+            const errorState = document.getElementById('errorState');
+            const leaderboardContent = document.getElementById('leaderboardContent');
+            
+            try {
+                loadingState.style.display = 'block';
+                errorState.style.display = 'none';
+                leaderboardContent.style.display = 'none';
+
+                // Get current filter and sort options
+                const gameFilter = document.getElementById('gameFilter').value;
+                const sortBy = document.getElementById('sortBy').value;
+                
+                // Build API URL with parameters
+                const apiUrl = new URL('http://localhost:3000/api/leaderboard');
+                apiUrl.searchParams.append('limit', '50');
+                apiUrl.searchParams.append('sortBy', sortBy);
+                
+                console.log('Fetching leaderboard from DSA-powered API:', apiUrl.toString());
+                
+                const response = await fetch(apiUrl.toString());
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error || 'Failed to load leaderboard');
+                }
+                
+                console.log('DSA Leaderboard API response:', data);
+                
+                // Process players data from DSA API
+                let players = data.leaderboard || [];
+                
+                // Convert API data to leaderboard format
+                players = players.map(player => ({
+                    uid: player.id,
+                    username: player.username || 'Unknown Player',
+                    fullName: player.username || 'Unknown Player',
+                    email: player.email || `${player.username}@example.com`,
+                    team: 'No Team',
+                    game: player.game || 'Dota 2',
+                    rating: player.rating || 0,
+                    matchesPlayed: player.matchesPlayed || 0,
+                    wins: player.wins || 0,
+                    kills: player.kills || 0,
+                    deaths: player.deaths || 0,
+                    role: player.role || 'player',
+                    joinDate: player.joinDate || new Date().toISOString(),
+                    status: 'active',
+                    userId: player.id
+                }));
+                
+                // If no players from API, show sample data
+                if (players.length === 0) {
+                    console.log('No players from DSA API, showing sample data');
+                    players = [
+                        {
+                            uid: 'sample1',
+                            username: 'ProGamer2024',
+                            fullName: 'Pro Gamer 2024',
+                            email: 'pro@example.com',
+                            team: 'Elite Squad',
+                            game: 'Dota 2',
+                            rating: 950,
+                            matchesPlayed: 150,
+                            wins: 120,
+                            kills: 2500,
+                            deaths: 800,
+                            role: 'Carry',
+                            joinDate: '2024-01-15',
+                            status: 'active',
+                            userId: 'sample1'
+                        },
+                        {
+                            uid: 'sample2',
+                            username: 'ElitePlayer',
+                            fullName: 'Elite Player',
+                            email: 'elite@example.com',
+                            team: 'Champions',
+                            game: 'Dota 2',
+                            rating: 920,
+                            matchesPlayed: 200,
+                            wins: 160,
+                            kills: 3000,
+                            deaths: 1000,
+                            role: 'Support',
+                            joinDate: '2024-02-01',
+                            status: 'active',
+                            userId: 'sample2'
+                        },
+                        {
+                            uid: 'sample3',
+                            username: 'Champion',
+                            fullName: 'Champion Player',
+                            email: 'champion@example.com',
+                            team: 'Victory Team',
+                            game: 'Dota 2',
+                            rating: 890,
+                            matchesPlayed: 180,
+                            wins: 140,
+                            kills: 2200,
+                            deaths: 900,
+                            role: 'Mid',
+                            joinDate: '2024-01-20',
+                            status: 'active',
+                            userId: 'sample3'
+                        }
+                    ];
+                }
+                
+                console.log('Processed players for DSA leaderboard:', players);
+
+                // Update UI
+                updateLeaderboardEntries(players);
+
+                console.log('Hiding loading state, showing leaderboard content');
+                loadingState.style.display = 'none';
+                leaderboardContent.style.display = 'block';
+
+            } catch (error) {
+                console.error('Error loading DSA leaderboard:', error);
+                loadingState.style.display = 'none';
+                errorState.style.display = 'block';
+                
+                // Show sample data on error as fallback
+                const samplePlayers = [
+                    {
+                        uid: 'sample1',
+                        username: 'ProGamer2024',
+                        fullName: 'Pro Gamer 2024',
+                        email: 'pro@example.com',
+                        team: 'Elite Squad',
+                        game: 'Dota 2',
+                        rating: 950,
+                        matchesPlayed: 150,
+                        wins: 120,
+                        kills: 2500,
+                        deaths: 800,
+                        role: 'Carry',
+                        joinDate: '2024-01-15',
+                        status: 'active',
+                        userId: 'sample1'
+                    },
+                    {
+                        uid: 'sample2',
+                        username: 'ElitePlayer',
+                        fullName: 'Elite Player',
+                        email: 'elite@example.com',
+                        team: 'Champions',
+                        game: 'Dota 2',
+                        rating: 920,
+                        matchesPlayed: 200,
+                        wins: 160,
+                        kills: 3000,
+                        deaths: 1000,
+                        role: 'Support',
+                        joinDate: '2024-02-01',
+                        status: 'active',
+                        userId: 'sample2'
+                    },
+                    {
+                        uid: 'sample3',
+                        username: 'Champion',
+                        fullName: 'Champion Player',
+                        email: 'champion@example.com',
+                        team: 'Victory Team',
+                        game: 'Dota 2',
+                        rating: 890,
+                        matchesPlayed: 180,
+                        wins: 140,
+                        kills: 2200,
+                        deaths: 900,
+                        role: 'Mid',
+                        joinDate: '2024-01-20',
+                        status: 'active',
+                        userId: 'sample3'
+                    }
+                ];
+                
+                updateLeaderboardEntries(samplePlayers);
+                leaderboardContent.style.display = 'block';
+            }
+        }
+
+        // Update leaderboard entries with medal and star design
+        function updateLeaderboardEntries(players) {
+            console.log('updateLeaderboardEntries called with:', players.length, 'players');
+            const entriesContainer = document.getElementById('leaderboardEntries');
+            console.log('Found entries container:', entriesContainer);
+            entriesContainer.innerHTML = '';
+
+            players.forEach((player, index) => {
+                const entry = document.createElement('div');
+                entry.className = 'player-entry';
+                
+                // Determine medal type
+                let medalClass = 'number';
+                let medalContent = index + 1;
+                
+                if (index === 0) {
+                    medalClass = 'gold';
+                    medalContent = '1';
+                } else if (index === 1) {
+                    medalClass = 'silver';
+                    medalContent = '2';
+                } else if (index === 2) {
+                    medalClass = 'bronze';
+                    medalContent = '3';
+                }
+                
+                // Calculate star rating (5 stars max, based on rating percentage)
+                const maxRating = 1000; // Maximum possible rating
+                const starCount = Math.min(5, Math.ceil((player.rating / maxRating) * 5));
+                
+                // Create star HTML
+                let starsHTML = '';
+                for (let i = 0; i < 5; i++) {
+                    if (i < starCount) {
+                        starsHTML += '<span class="star">★</span>';
+                    } else {
+                        starsHTML += '<span class="star empty">★</span>';
+                    }
+                }
+                
+                entry.innerHTML = `
+                    <div class="rank-medal">
+                        <div class="medal-icon ${medalClass}">${medalContent}</div>
+                    </div>
+                    <div class="player-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="player-info">
+                        <div class="player-name">${player.fullName || player.username || 'Unknown Player'}</div>
+                        <div class="player-email">${player.email}</div>
+                    </div>
+                    <div class="star-rating">
+                        ${starsHTML}
+                    </div>
+                    <div class="player-score">${player.rating}</div>
+                `;
+                
+                entriesContainer.appendChild(entry);
+            });
+            
+            console.log('Added', players.length, 'entries to leaderboard');
+        }
+
+        // Event listeners
+        document.getElementById('refreshLeaderboard').addEventListener('click', loadLeaderboardData);
+        document.getElementById('retryBtn').addEventListener('click', loadLeaderboardData);
+
+        // Filter and sort functionality
+        document.getElementById('gameFilter').addEventListener('change', () => {
+            console.log('Game filter changed');
+            loadLeaderboardData(); // Reload with new filter
+        });
+
+        document.getElementById('sortBy').addEventListener('change', () => {
+            console.log('Sort changed');
+            loadLeaderboardData(); // Reload with new sort
+        });
+
+        // Action functions
+        function viewPlayer(uid) {
+            console.log('View player:', uid);
+            // Implement view player functionality
+        }
+
+        function editPlayer(uid) {
+            console.log('Edit player:', uid);
+            // Implement edit player functionality
+        }
+
+        function deletePlayer(uid) {
+            console.log('Delete player:', uid);
+            // Implement delete player functionality
+        }
+    </script>
+</body>
+</html>

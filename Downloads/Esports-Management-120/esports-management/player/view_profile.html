@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Player Profile - Player</title>
+<link rel="stylesheet" href="../css_player/view_profile.css">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+<div class="profile-container">
+    <div class="profile-header">
+        <div class="username" id="username">Player123</div>
+        <div class="role-badge" id="playerRole">Player</div>
+        <h2>Player Profile</h2>
+    </div>
+
+    <div class="profile-content">
+        <div class="profile-section">
+            <h2>Player Information</h2>
+            <pre id="profileText">Lorem ipsum dolor sit amet...</pre>
+            <p><strong>Username:</strong> <span id="usernameField"></span></p>
+            <p><strong>Email:</strong> <span id="emailField"></span></p>
+            <p><strong>Role:</strong> <span id="roleField"></span></p>
+            <p><strong>Join Date:</strong> <span id="joinDate"></span></p>
+            <p><strong>Rating:</strong> <span id="avgRating"></span>/5.00</p>
+
+            <div class="rating-meter">
+                <div class="rating-fill" id="ratingFill"></div>
+                <div class="rating-value" id="ratingValue"></div>
+            </div>
+
+            <div class="profile-meta">
+                <div class="meta-item">
+                    <div class="meta-value" id="totalMatches">0</div>
+                    <div class="meta-label">Matches</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-value" id="totalTournaments">0</div>
+                    <div class="meta-label">Tournaments</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-value" id="kdRatio">0</div>
+                    <div class="meta-label">K/D Ratio</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-section team-section">
+            <h2>Team Information</h2>
+            <p><strong>Team Name:</strong> <span id="teamName"></span></p>
+            <p><strong>Team Creation Date:</strong> <span id="teamCreation"></span></p>
+            <p><strong>Manager Email:</strong> <span id="managerEmail"></span></p>
+        </div>
+
+        <div class="profile-section stats-section">
+            <h2>Player Statistics</h2>
+            <p><strong>Total Kills:</strong> <span id="totalKills">0</span></p>
+            <p><strong>Total Deaths:</strong> <span id="totalDeaths">0</span></p>
+            <p><strong>K/D Ratio:</strong> <span id="kdRatioStat">0</span></p>
+            <p><strong>Win Rate:</strong> <span id="winRate">0</span>%</p>
+            <p><strong>Total Matches Played:</strong> <span id="matchesPlayed">0</span></p>
+            <p><strong>Total Tournaments:</strong> <span id="tournamentsPlayed">0</span></p>
+
+            <div class="stats-chart-container">
+                <div class="chart-title">Performance Analytics</div>
+                <div class="stats-chart">
+                    <canvas id="statsChart"></canvas>
+                </div>
+            </div>
+
+            <div class="radar-chart-container">
+                <div class="chart-title">Skill Analysis</div>
+                <canvas id="radarChart"></canvas>
+            </div>
+        </div>
+
+        <div class="profile-section achievements-section">
+            <h2>Achievements</h2>
+            <div class="achievements-grid">
+                <div class="achievement-badge">
+                    <div class="badge-icon"><i class="fas fa-trophy"></i></div>
+                    <div class="badge-name">Tournament Champion</div>
+                    <div class="badge-desc">Won a tournament</div>
+                </div>
+                <div class="achievement-badge">
+                    <div class="badge-icon"><i class="fas fa-fire"></i></div>
+                    <div class="badge-name">Killing Spree</div>
+                    <div class="badge-desc">5+ kills in a match</div>
+                </div>
+                <div class="achievement-badge">
+                    <div class="badge-icon"><i class="fas fa-medal"></i></div>
+                    <div class="badge-name">MVP</div>
+                    <div class="badge-desc">Match MVP award</div>
+                </div>
+                <div class="achievement-badge">
+                    <div class="badge-icon"><i class="fas fa-star"></i></div>
+                    <div class="badge-name">All-Star</div>
+                    <div class="badge-desc">Top rated player</div>
+                </div>
+            </div>
+        </div>
+
+        <a href="../player_dashboard.html"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+    </div>
+</div>
+
+<script>
+    // Sample player data
+    const playerProfile = {
+        username: "Player123",
+        email: "player@example.com",
+        role: "Player",
+        joinDate: "2025-01-01",
+        avgRating: 4.2,
+        totalMatches: 10,
+        totalTournaments: 3,
+        totalKills: 50,
+        totalDeaths: 25,
+        kdRatio: 2.0,
+        winRate: 75,
+        teamName: "Alpha Team",
+        teamCreation: "2024-01-01",
+        managerEmail: "manager@example.com",
+        accuracy: 70,
+        teamwork: 65,
+        strategy: 75,
+        reactionTime: 80,
+        gameSense: 60
+    };
+
+    document.getElementById("username").textContent = playerProfile.username;
+    document.getElementById("playerRole").textContent = playerProfile.role;
+    document.getElementById("usernameField").textContent = playerProfile.username;
+    document.getElementById("emailField").textContent = playerProfile.email;
+    document.getElementById("roleField").textContent = playerProfile.role;
+    document.getElementById("joinDate").textContent = playerProfile.joinDate;
+    document.getElementById("avgRating").textContent = playerProfile.avgRating.toFixed(2);
+    document.getElementById("ratingFill").style.width = (playerProfile.avgRating*20) + "%";
+    document.getElementById("ratingValue").textContent = playerProfile.avgRating.toFixed(2) + "/5.00";
+    document.getElementById("totalMatches").textContent = playerProfile.totalMatches;
+    document.getElementById("totalTournaments").textContent = playerProfile.totalTournaments;
+    document.getElementById("kdRatio").textContent = playerProfile.kdRatio.toFixed(2);
+    document.getElementById("totalKills").textContent = playerProfile.totalKills;
+    document.getElementById("totalDeaths").textContent = playerProfile.totalDeaths;
+    document.getElementById("kdRatioStat").textContent = playerProfile.kdRatio.toFixed(2);
+    document.getElementById("winRate").textContent = playerProfile.winRate.toFixed(2);
+    document.getElementById("matchesPlayed").textContent = playerProfile.totalMatches;
+    document.getElementById("tournamentsPlayed").textContent = playerProfile.totalTournaments;
+    document.getElementById("teamName").textContent = playerProfile.teamName;
+    document.getElementById("teamCreation").textContent = playerProfile.teamCreation;
+    document.getElementById("managerEmail").textContent = playerProfile.managerEmail;
+
+    // Charts
+    const statsCtx = document.getElementById('statsChart').getContext('2d');
+    new Chart(statsCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Kills', 'Deaths', 'K/D Ratio', 'Win Rate'],
+            datasets: [{
+                label: 'Player Stats',
+                data: [playerProfile.totalKills, playerProfile.totalDeaths, playerProfile.kdRatio, playerProfile.winRate],
+                backgroundColor: ['rgba(33,150,243,0.6)','rgba(255,87,34,0.6)','rgba(123,31,162,0.6)','rgba(76,175,80,0.6)'],
+                borderColor: ['rgba(33,150,243,1)','rgba(255,87,34,1)','rgba(123,31,162,1)','rgba(76,175,80,1)'],
+                borderWidth: 2
+            }]
+        },
+        options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}} }
+    });
+
+    const radarCtx = document.getElementById('radarChart').getContext('2d');
+    new Chart(radarCtx, {
+        type: 'radar',
+        data: {
+            labels: ['Accuracy', 'Teamwork', 'Strategy', 'Reaction Time', 'Game Sense'],
+            datasets:[{
+                label:'Skills',
+                data:[playerProfile.accuracy, playerProfile.teamwork, playerProfile.strategy, playerProfile.reactionTime, playerProfile.gameSense],
+                backgroundColor:'rgba(54,162,235,0.2)',
+                borderColor:'rgba(54,162,235,1)',
+                pointBackgroundColor:'rgba(54,162,235,1)',
+                pointBorderColor:'#fff',
+                pointHoverBackgroundColor:'#fff',
+                pointHoverBorderColor:'rgba(54,162,235,1)'
+            }]
+        },
+        options:{responsive:true, maintainAspectRatio:false}
+    });
+</script>
+</body>
+</html>

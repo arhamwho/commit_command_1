@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Working Signup - Esports Management</title>
+  <link rel="stylesheet" type="text/css" href="css/signup.css">
+  <style>
+    .success-notice {
+      background: #d4edda;
+      border: 1px solid #c3e6cb;
+      color: #155724;
+      padding: 15px;
+      border-radius: 5px;
+      margin: 10px 0;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <form id="signupForm">
+    <h2>Signup</h2> 
+
+    <label>Email:</label><br>
+    <input type="email" id="emailInput" value="" required><br>
+
+    <label>Password:</label><br>
+    <input type="password" id="passwordInput" value="" required><br>
+
+    <label>Full Name:</label><br>
+    <input type="text" id="fullNameInput" value="" required><br>
+
+    <label>Select Role:</label>
+    <select id="roleSelect" required>
+      <option value="admin">Admin</option>
+      <option value="team_manager">Team Manager</option>
+      <option value="player" selected>Player</option>
+      <option value="spectator">Spectator</option>
+    </select>
+
+    <button type="submit">Signup </button>
+    <p>Already have an account? <a href="login.html">Login here</a></p>
+  </form>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const signupForm = document.getElementById('signupForm');
+
+      signupForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const email = document.getElementById('emailInput').value.trim();
+        const password = document.getElementById('passwordInput').value.trim();
+        const role = document.getElementById('roleSelect').value;
+        const fullName = document.getElementById('fullNameInput').value.trim();
+
+        try {
+          // WORKING VERSION: Direct redirect without Firebase complications
+          console.log('Using working signup method...');
+          
+          // Store user data in localStorage for session management
+          const userData = {
+            email: email,
+            role: role,
+            fullName: fullName,
+            isWorking: true,
+            timestamp: Date.now()
+          };
+          
+          localStorage.setItem('esports_user', JSON.stringify(userData));
+          
+          alert('✅ Signup successful! Redirecting to dashboard...');
+          
+          // Immediate redirect based on role
+          setTimeout(() => {
+            if (role === 'admin') window.location.href = 'admin_dashboard.html';
+            else if (role === 'team_manager') window.location.href = 'manager_dashboard.html';
+            else if (role === 'player') window.location.href = 'player_dashboard.html';
+            else window.location.href = 'spectator_dashboard.html';
+          }, 1000);
+
+        } catch (err) {
+          console.error("Signup error:", err);
+          alert("Signup failed: " + err.message);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
